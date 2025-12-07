@@ -65,7 +65,7 @@ class World {
 }
 
 
-const world = new World()
+const world = new World(2)
 
 function work() {
     if (world.location == "B") {
@@ -123,50 +123,6 @@ locB.addEventListener('click', () => {
     }
 })
 
-// function automate() {
-
-//     if (world.location == "A") {
-//         suction()
-//         world.simulate("suction")
-//         world.simulate("right")
-//         work()
-//         console.log("if A")
-//     }
-//     else if (world.location == "B") {
-//         suction()
-//         world.simulate("suction")
-//         world.simulate("left")
-//         work()
-//         console.log("if B")
-//     }
-//     // work()
-//     if (world.floors[0].dirty == false && world.floors[1].dirty == false) 
-//         { clearInterval(automation) 
-//             console.log("clearInterval")
-//         }
-//     // if (world.floors[0].dirty == false) {
-//     //     world.simulate("right")
-//     //     work() 
-//     //     if (world.floors[1].dirty == false) {
-//     //         world.simulate("left")
-//     //         work() 
-
-//     //         clearInterval(automation)
-//     //     }
-//     // }
-
-//     recheckState()
-// }
-
-// let automation = setInterval(automate, 1000)
-
-// function recheckState(){
-//     setInterval(()=>{
-//         if (world.floors[0].dirty == true || world.floors[1].dirty == true){
-//             setInterval(automate, 1000)
-//         }
-//     },1000)
-// }
 
 let interval = null
 
@@ -175,30 +131,41 @@ function startRobot() {
 }
 
 
-function stopRobot() {
-    clearInterval(interval)
-    interval = null
-
+function startRobot() {
+    if (interval) return; // already running
+    interval = setInterval(automate, 1000)
 }
 
 function automate() {
     let allClean = world.floors[0].dirty == false && world.floors[1].dirty == false
+    if(allClean == true){
+        if(world.location !== "A"){
+            world.simulate("left");
+            work();
+        }
+        stopRobot()
+        return
+    }
     if (world.location == "A" && world.floors[0].dirty == true) {
         suction()
         world.simulate("suction")
-        world.simulate("right")
         work()
     }
     else if (world.location == "B" && world.floors[1].dirty == true) {
         suction()
         world.simulate("suction")
+        work()
+    }
+    else if (world.location == "A" && world.floors[1].dirty == true) {
+        world.simulate("right")
+        work()
+    }
+    else if (world.location == "B" && world.floors[0].dirty == true) {
         world.simulate("left")
         work()
     }
-    if(allClean == true){
-        stopRobot()
-    }
 }
+
 
 startRobot()
 
@@ -209,6 +176,6 @@ setInterval(()=>{
    if (floorA == true || floorB == true){
     startRobot()
    }
-},1000)
+},800)
 
 
